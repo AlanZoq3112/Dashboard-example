@@ -2,6 +2,7 @@ package com.peliculas.peliculasBack.Service;
 
 import com.peliculas.peliculasBack.Dto.PeliculaDto;
 import com.peliculas.peliculasBack.Models.Pelicula;
+import com.peliculas.peliculasBack.Models.PeliculaLogsRepository;
 import com.peliculas.peliculasBack.Models.PeliculaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,9 @@ public class PeliculaService {
     @Autowired
     private PeliculaRepository repository;
 
+    @Autowired
+    private PeliculaLogsRepository peliculaLogsRepository;
+
     @Transactional(readOnly = true)
     public CustomResponse<List<Pelicula>> getAll(){
         return new CustomResponse<>(
@@ -32,17 +36,17 @@ public class PeliculaService {
         );
     }
 
-    @Transactional(rollbackFor = {SQLException.class})
-    public CustomResponse<Pelicula> insert(Pelicula movie){
-        Optional<Pelicula> exists =this.repository.findByName(movie.getName());
-        if(exists.isPresent()){
-            return new CustomResponse<>(null,true,400,"El nombre de la peli esta registrado");
-        }
+    public CustomResponse<Pelicula> insert(Pelicula movies) {
+        Pelicula savedMovie = this.repository.saveAndFlush(movies);
+
+        // inserta un registro en la tabla de bitácora
+        peliculaLogsRepository.insertMovieLog(savedMovie.getId());
+
         return new CustomResponse<>(
-                this.repository.saveAndFlush(movie),
+                savedMovie,
                 false,
                 200,
-                "Película Registrado!"
+                "Película registrada"
         );
     }
 
@@ -65,37 +69,28 @@ public class PeliculaService {
         );
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(PeliculaService.class);
-    @Transactional
-    public CustomResponse<Pelicula> delete(Long id) {
-        try {
-            Optional<Pelicula> peliculaOptional = repository.findById(id);
-
-            if (!peliculaOptional.isPresent()) {
-                return new CustomResponse<>(
-                        null,
-                        true,
-                        400,
-                        "La película no existe"
-                );
-            }
-
-            repository.deleteById(id);
-            return new CustomResponse<>(
-                    null,
-                    false,
-                    200,
-                    "Pelicula eliminada!"
-            );
-        } catch (Exception e) {
-            e.printStackTrace(); // Loguea la excepción para diagnóstico
+    //delete by id
+    public CustomResponse<Boolean> deleteById(Long id) {
+        if (!this.repository.existsById(id)) {
             return new CustomResponse<>(
                     null,
                     true,
-                    500,
-                    "Error interno al intentar eliminar la película"
+                    400,
+                    "La película no existe"
             );
         }
+
+        peliculaLogsRepository.disableForeignKeyChecks();
+        peliculaLogsRepository.insertDeleteLog(id);
+        this.repository.deleteById(id);
+        peliculaLogsRepository.enableForeignKeyChecks();
+
+        return new CustomResponse<>(
+                true,
+                false,
+                200,
+                "Película eliminada exitosamente"
+        );
     }
 
 

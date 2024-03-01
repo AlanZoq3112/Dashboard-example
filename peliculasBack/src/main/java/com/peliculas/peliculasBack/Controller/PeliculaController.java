@@ -78,12 +78,17 @@ public class PeliculaController {
         );
     }
 
-    @DeleteMapping("/peliculas/{id}")
-    public ResponseEntity<CustomResponse<Pelicula>> delete(@PathVariable Long id) {
-        return new ResponseEntity<>(
-                this.service.delete(id),
-                HttpStatus.CREATED
-        );
-    }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<CustomResponse<Boolean>> deleteMovieById(@PathVariable Long id) {
+        CustomResponse<Boolean> response = service.deleteById(id);
+        if (response.getError()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(response);
+        }
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
 }
