@@ -1,92 +1,55 @@
 <template>
   <div>
     <div>
-      <br/>
+      <br />
       <div>
         <h1>Buscador <b-icon icon="search"></b-icon></h1>
       </div>
       <br />
-      <b-card
-        class="shadow"
-        style="display: flex; justify-content: center; align-items: center"
-        v-show="showElement"
-      >
+      <b-card class="shadow" style="display: flex; justify-content: center; align-items: center" v-show="showElement">
         <b-row>
           <b-col cols="3">
             <b-form-group label="Título de la película:" label-for="title">
-              <b-form-input
-                id="title"
-                v-model="filters.title"
-                placeholder="Título de la película..."
-                :type="'search'"
-              />
+              <b-form-input id="title" v-model="filters.title" placeholder="Título de la película..." :type="'search'" />
             </b-form-group>
           </b-col>
           <b-col cols="3">
             <b-form-group label="Director:" label-for="director">
-              <b-form-input
-                v-model="filters.director"
-                placeholder="Director..."
-                :type="'search'"
-              />
+              <b-form-input v-model="filters.director" placeholder="Director..." :type="'search'" />
             </b-form-group>
           </b-col>
           <b-col cols="3">
             <b-form-group label="De:" label-for="fecha1">
-              <b-form-datepicker
-                id="fecha1"
-                v-model="filters.firstDate"
-              ></b-form-datepicker>
+              <b-form-datepicker id="fecha1" v-model="filters.firstDate"></b-form-datepicker>
             </b-form-group>
           </b-col>
           <b-col cols="3">
             <b-form-group label="Hasta:" label-for="fecha2">
-              <b-form-datepicker
-                id="fecha2"
-                v-model="filters.secondDate"
-              ></b-form-datepicker>
+              <b-form-datepicker id="fecha2" v-model="filters.secondDate"></b-form-datepicker>
             </b-form-group>
           </b-col>
           <b-col cols="6">
             <b-form-group label="Categorías:" label-for="categories">
-              <b-form-select
-                id="categories"
-                v-model="filters.categoryId"
-                :options="categoriesOptions"
-              >
+              <b-form-select id="categories" v-model="filters.categoryId" :options="categoriesOptions">
                 <template #first>
-                  <b-form-select-option :value="null"
-                    >Categoríás</b-form-select-option
-                  >
+                  <b-form-select-option :value="null">Categoríás</b-form-select-option>
                 </template>
               </b-form-select>
             </b-form-group>
           </b-col>
           <b-col cols="6">
             <b-form-group label="Ordenar por:" label-for="sorts">
-              <b-form-select
-                id="sorts"
-                v-model="customOrder.sort"
-                :options="sortOptions"
-              />
+              <b-form-select id="sorts" v-model="customOrder.sort" :options="sortOptions" />
             </b-form-group>
           </b-col>
           <b-col cols="4">
             <b-form-group label="Dirección:" label-for="directions">
-              <b-form-select
-                id="directions"
-                v-model="customOrder.direction"
-                :options="directionOptions"
-              />
+              <b-form-select id="directions" v-model="customOrder.direction" :options="directionOptions" />
             </b-form-group>
           </b-col>
           <b-col class="mt-3">
             <b-row class="d-flex flex-row-reverse">
-              <b-button
-                @click="searchMovies"
-                variant="primary"
-                class="mr-3 my-2"
-              >
+              <b-button @click="searchMovies" variant="primary" class="mr-3 my-2">
                 <b-icon icon="search"></b-icon>
                 Buscar
               </b-button>
@@ -102,42 +65,22 @@
         Agregar nueva pelicula
       </b-button>
       <br />
-      <br/>
+      <br />
       <b-row v-if="movies.length > 0">
         <b-col cols="12">
           <b-row>
-            <TransitionGroup
-              name="zoom"
-              tag="div"
-              class="d-flex flex-row flex-wrap"
-            >
-              <b-col
-                cols="12"
-                sm="4"
-                md="4"
-                lg="3"
-                v-for="movie in movies"
-                :key="movie.id"
-              >
-                <b-card
-                  :title="movie.title"
-                  img-src="https://indicepolitico.com/wp-content/uploads/2021/06/cinedot.jpg"
-                  img-alt="Image"
-                  img-top
-                  tag="article"
-                  style="max-width: 40rem"
-                  class="mb-2 shadow"
-                >
-                  <b-card-text
-                    >Description: {{ movie.description }}</b-card-text
-                  >
+            <TransitionGroup name="zoom" tag="div" class="d-flex flex-row flex-wrap">
+              <b-col cols="12" sm="4" md="4" lg="3" v-for="movie in movies" :key="movie.id">
+                <b-card :title="movie.title" img-src="https://indicepolitico.com/wp-content/uploads/2021/06/cinedot.jpg"
+                  img-alt="Image" img-top tag="article" style="max-width: 40rem" class="mb-2 shadow">
+                  <b-card-text>Description: {{ movie.description }}</b-card-text>
                   <b-card-text>Director: {{ movie.director }}</b-card-text>
-                  <b-card-text
-                    >Fecha de estreno: {{ movie.publishDate }}</b-card-text
-                  >
-                  <b-card-text
-                    >Categoria: {{ movie.category.name }}</b-card-text
-                  >
+                  <b-card-text>Fecha de estreno: {{ movie.publishDate }}</b-card-text>
+                  <b-card-text>Categoria: {{ movie.category.name }}</b-card-text>
+                  <b-button @click="editMovie(movie.id)" variant="warning" class="mr-3 my-2">
+                    <b-icon icon="pencil"></b-icon>
+                    Editar
+                  </b-button>
                 </b-card>
               </b-col>
             </TransitionGroup>
@@ -153,19 +96,17 @@
         </b-col>
       </b-row>
 
-      <ModalForm
-        :movieData="movieData"
-        :isNew="isNewMovie"
-        @getMovies="getMovies"
-      />
+      <p>
+        {{movieData}}
+      </p>
 
-      <LogsMovies/>
+      <ModalForm :movieData="movieData" :isNew="isNewMovie" @getMovies="getMovies" />
 
-      <loading
-        :active.sync="isLoading"
-        :can-cancel="false"
-        :is-full-page="fullPage"
-      ></loading>
+      <ModalFormEdit :movieData="movieData" :isNew="isNewMovie" @getMovies="getMovies" />
+
+      <LogsMovies />
+
+      <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="fullPage"></loading>
     </div>
   </div>
 </template>
@@ -175,6 +116,7 @@ import MovieService from "../services/MovieService";
 import CategoryService from "../../category/services/CategoryService";
 import ModalForm from "./ModalForm.vue";
 import LogsMovies from "./LogsMovies.vue";
+import ModalFormEdit from "./ModalFormEdit.vue";
 
 import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/vue-loading.css";
@@ -184,6 +126,7 @@ export default {
     ModalForm,
     Loading,
     LogsMovies,
+    ModalFormEdit
   },
   data() {
     return {
@@ -240,6 +183,21 @@ export default {
       this.$bvModal.show("form");
       this.isNewMovie = true;
       this.resetMovieData();
+    },
+    editMovie(idMovie) {
+      this.getMovie(idMovie);
+      this.$bvModal.show("formEdit");
+    },
+    async getMovie(idMovie) {
+      this.isLoading = true;
+      try {
+        const movie = await MovieService.getMovie(idMovie);
+        this.movieData = movie.data;
+      } catch (error) {
+        console.error(error.message);
+      } finally {
+        this.isLoading = false;
+      }
     },
     async updateMovie(movie) {
       this.$bvModal.show("form");
@@ -331,8 +289,6 @@ export default {
     onScroll() {
       const currentScrollPosition =
         window.pageYOffset || document.documentElement.scrollTop;
-      console.log(currentScrollPosition);
-
       if (Math.abs(currentScrollPosition - this.lastScrollPosition) < 60) {
         return;
       }
@@ -367,6 +323,7 @@ export default {
 .zoom-leave-to {
   transform: scale(0);
 }
+
 .shadow {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

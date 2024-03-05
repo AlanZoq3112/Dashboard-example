@@ -2,6 +2,8 @@ package mx.edu.utez.peliculas.modules.movie.controller;
 
 import lombok.AllArgsConstructor;
 import mx.edu.utez.peliculas.kernel.ResponseApi;
+import mx.edu.utez.peliculas.modules.logs.model.Log;
+import mx.edu.utez.peliculas.modules.logs.service.LogService;
 import mx.edu.utez.peliculas.modules.movie.controller.dto.SearchMovieDto;
 import mx.edu.utez.peliculas.modules.movie.model.Movie;
 import mx.edu.utez.peliculas.modules.movie.service.MovieService;
@@ -10,12 +12,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api/movie")
 @CrossOrigin(origins = {"*"})
 @AllArgsConstructor
 public class MovieController {
     private final MovieService movieService;
+    private final LogService logService;
 
     @PostMapping("/paged/")
     public ResponseEntity<ResponseApi<Page<Movie>>> getAll(Pageable pageable,
@@ -28,6 +33,10 @@ public class MovieController {
     public ResponseEntity<ResponseApi<Movie>> getOne(@PathVariable("id") Long id) {
         ResponseApi<Movie> movieResponseApi = this.movieService.findOne(id);
         return new ResponseEntity<>(movieResponseApi, movieResponseApi.getStatus());
+    }
+    @GetMapping("/")
+    public List<Log> getLogs() {
+        return this.logService.getAll();
     }
 
     @PostMapping("/")

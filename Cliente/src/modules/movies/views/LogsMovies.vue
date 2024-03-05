@@ -27,7 +27,7 @@
   </div>
 </template>
   
-  <script>
+<script scope>
 import MovieService from "../services/MovieService";
 
 export default {
