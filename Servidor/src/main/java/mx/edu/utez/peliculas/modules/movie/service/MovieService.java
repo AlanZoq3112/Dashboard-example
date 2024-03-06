@@ -166,6 +166,44 @@ public class MovieService {
     }
 
     @Transactional(rollbackFor = {SQLException.class, Exception.class})
+    public ResponseApi<Void> delete(Long id) {
+        try {
+            if (!this.iMovieRepository.existsById(id)) {
+                return new ResponseApi<>(
+                        HttpStatus.BAD_REQUEST,
+                        true,
+                        Errors.NO_DATA_FOUND.name()
+                );
+            }
+
+            Movie deleteMovie = this.iMovieRepository.findById(id).orElse(null); // Obtiene la película antes de eliminarla para propósitos de registro
+            iMovieRepository.deleteById(id);
+
+            // Registra el log después de actualizar la película
+            Log log = new Log();
+            log.setTabla("peliculas");
+            log.setOperacion("ELIMINACIÓN");
+            log.setDescripcion("Película eliminada: " + deleteMovie.getTitle());
+            logService.registrarLog(log);
+
+            // Crea la respuesta
+            ResponseApi<Void> response = new ResponseApi<>(
+                    HttpStatus.OK,
+                    false,
+                    "Pelicula Eliminada"
+            );
+            return response;
+        }catch (Exception e) {
+            // Maneja la excepción y devuelve un mensaje de error apropiado
+            return new ResponseApi<>(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    true,
+                    "Error eliminando pelicula: " + e.getMessage()
+            );
+        }
+    }
+
+    @Transactional(rollbackFor = {SQLException.class, Exception.class})
     public ResponseApi<Movie> changeStatus(Long id) {
         Optional<Movie> optionalMovie = this.iMovieRepository.findById(id);
         if (optionalMovie.isEmpty()) {

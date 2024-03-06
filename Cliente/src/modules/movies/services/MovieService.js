@@ -35,6 +35,17 @@ const updateMovie = async (movieData) => {
   }
 };
 
+const deleteMovie = async (id) => {
+  console.log(`${api}${id}`)
+  axios.delete(`${api}${id}`)
+  .then(response => {
+    console.log('Elemento eliminado con éxito:', response.data);
+  })
+  .catch(error => {
+    console.error('Error al intentar eliminar el elemento:', error);
+  });
+};
+
 const getMovies = async (params, body) => {
   try {
     const pagination = params
@@ -87,4 +98,5 @@ export default {
   updateMovie,
   changeStatus,
   fetchLogs,
+  deleteMovie
 };

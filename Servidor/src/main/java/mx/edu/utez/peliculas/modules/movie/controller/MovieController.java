@@ -9,6 +9,7 @@ import mx.edu.utez.peliculas.modules.movie.model.Movie;
 import mx.edu.utez.peliculas.modules.movie.service.MovieService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,6 +50,17 @@ public class MovieController {
     public ResponseEntity<ResponseApi<Movie>> update(@RequestBody Movie movie) {
         ResponseApi<Movie> movieResponseApi = this.movieService.update(movie);
         return new ResponseEntity<>(movieResponseApi, movieResponseApi.getStatus());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable("id") Long id) {
+        try {
+            System.out.println(id);
+            movieService.delete(id);
+            return new ResponseEntity<>("Pelicula eliminada con éxito", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al eliminar la pelicula: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PatchMapping("/{id}")

@@ -77,9 +77,13 @@
                   <b-card-text>Director: {{ movie.director }}</b-card-text>
                   <b-card-text>Fecha de estreno: {{ movie.publishDate }}</b-card-text>
                   <b-card-text>Categoria: {{ movie.category.name }}</b-card-text>
-                  <b-button @click="editMovie(movie.id)" variant="warning" class="mr-3 my-2">
+                  <b-button @click="editMovie(movie.id)" variant="warning" class="mr-3 my-2 ml-4">
                     <b-icon icon="pencil"></b-icon>
                     Editar
+                  </b-button>
+                  <b-button @click="deleteMovie(movie.id)" variant="danger" class="mr-4 my-2 ">
+                    <b-icon icon="trash"></b-icon>
+                    Eliminar
                   </b-button>
                 </b-card>
               </b-col>
@@ -205,6 +209,17 @@ export default {
       this.isNewMovie = false;
       const { data: selectedMovie } = await MovieService.getMovie(movie.id);
       this.movieData = { ...selectedMovie };
+    },
+    async deleteMovie(idMovie) {
+      this.isLoading = true;
+      try {
+        await MovieService.deleteMovie(idMovie);
+      } catch (error) {
+        console.error(error.message);
+      } finally {
+        this.isLoading = false;
+        this.getMovies();
+      }
     },
     resetMovieData() {
       this.movieData = {
